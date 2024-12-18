@@ -1,0 +1,73 @@
+ Réponses aux exercices du tp:
+ 
+ 
+ Exercice 3. R´ef´erence et utilisation de BLAS/LAPACK
+
+A l’aide de la documentation de BLAS et LAPACK r´epondez aux questions suivantes :
+1. En C, comment doit on d´eclarer et allouer une matrice pour utiliser BLAS et LAPACK
+?
+    Pour utiliser BLAS et LAPACK en C, il fautdéclarer ses matrices comme des tableaux 1D, 
+les allouer dynamiquement, et gérer l'accès avec le format column-major.
+
+2. Quelle est la signification de la constante LAPACK COL MAJOR ?
+    La constante LAPACK COL MAJOR est une constante qui indique que la matrice est stockée en format column-major.
+
+3. `A quoi correspond la dimension principale (leading dimension) g´en´eralement not´ee ld ?
+    La dimension principale correspond à la taille mémoire allouée pour une colonne de la matrice.
+
+4. Que fait la fonction dgbmv ? Quelle m´ethode impl´emente-t-elle ?
+    La fonction dgbmv fait une multiplication de matrice par vecteur avec une matrice bande.
+
+5. Que fait la fonction dgbtrf ? Quelle m´ethode impl´emente-t-elle ?
+    La fonction dgbtrf est une fonction LAPACK qui effectue la décomposition LU 
+    d'une matrice bande avec pivotage partiel. Elle utilise une version adaptée de l'algorithme LU 
+    pour les matrices bandes afin de minimiser les calculs et la mémoire.
+
+6. Que fait la fonction dgbtrs ? Quelle m´ethode impl´emente-t-elle ?
+    La fonction dgbtrs est une fonction LAPACK qui résout un système linéaire de la forme : AX=B
+    Elle utilise la décomposition LU calculée par dgbtrf pour résoudre le système linéaire 
+    en effectuant une substitution directe avant/arrière
+
+7. Que fait la fonction dgbsv ? Quelle m´ethode impl´emente-t-elle ?    
+    La fonction dgbsv fait une résolution de système linéaire avec une matrice bande.
+    Elle effectue la décomposition LU (dgbtrf) suivie de la substitution avant/arrière (dgbtrs) 
+    pour résoudre le système. Elle combine donc les deux étapes.
+
+8. Comment calculer la norme du r´esidu relatif avec des appels BLAS ?
+    La norme du résidu relatif est obtenu en utilisant dgemv et dnrm2.
+
+
+
+Exercice 4. Stockage GB et appel `a DGBMV
+
+1. ´Ecrire le stockage GB en priorit´e colonne pour la matrice de Poisson 1D.
+    Voir fonction set_GB_operator_colMajor_poisson1D dans lib_poisson1D.
+
+2. Utilisez la fonction BLAS dgbmv avec cette matrice.
+3. Proposez une m´ethode de validation
+    Voir fonction test_dgbmv_poisson1D dans lib_poisson1D et tests dans tp_poisson1D_direct.c.
+
+
+ Exercice 5. DGBTRF, DGBTRS, DGBSV
+
+1. R´esoudre le syst`eme lin´eaire par une m´ethode directe en faisant appel `a LAPACK.
+    Voir implémentation dgbsv dans tp_poisson1D_direct
+
+2. ´Evaluer les performances. Que dire de la complexit´e des m´ethodes appel´ees ?
+    Tests de performances ajoutés dans l'implémentation
+
+    Pour une matrice tridiagonale de taille n×n :
+    DGBTRF (Factorisation LU bande) :
+        Complexité : O(n) opérations car la matrice est tridiagonale
+        Stockage : O(3n) car nous avons 3 diagonales
+    DGBTRS (Résolution triangulaire) :
+        Complexité : O(n) opérations
+        Utilise les matrices L et U stockées dans AB
+    DGBSV (Combinaison des deux) :
+        Complexité totale : O(n) opérations
+        Plus efficace que d'appeler DGBTRF et DGBTRS séparément car optimisé
+    Les avantages de chaque méthode :
+    DGBTRF + DGBTRS : permet de réutiliser la factorisation pour plusieurs seconds membres
+    DGBSV : plus simple à utiliser et légèrement plus efficace pour un seul second membre
+
+
