@@ -1,6 +1,6 @@
 #######################################
-# debian.mk
-# Default options for debian computer
+# ambre.mk
+# Default options for ambre computer
 #######################################
 CC=gcc
 LIBSLOCAL=-L/usr/lib -llapack -lblas -lm

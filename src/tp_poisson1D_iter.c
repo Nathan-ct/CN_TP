@@ -30,11 +30,8 @@ int main(int argc,char *argv[])
 
   double opt_alpha;
 
-  if (argc == 2) {
+  if (argc > 1) {
     IMPLEM = atoi(argv[1]);
-  } else if (argc > 2) {
-    perror("Application takes at most one argument");
-    exit(1);
   }
 
   /* Size of the problem */
@@ -89,9 +86,42 @@ int main(int argc,char *argv[])
   resvec=(double *) calloc(maxit, sizeof(double));
 
   /* Solve with Richardson alpha */
-  if (IMPLEM == ALPHA) {
-    richardson_alpha(AB, RHS, SOL, &opt_alpha, &lab, &la, &ku, &kl, &tol, &maxit, resvec, &nbite);
+  switch(IMPLEM) {
+    case 0:
+      printf("\n=== Méthode de Richardson ===\n");
+      richardson_alpha(AB, RHS, X, &opt_alpha, &lab, &la, &ku, &kl, &tol, &maxit, resvec, &nbite);
+      break;
+    case 1:
+      printf("\n=== Méthode de Jacobi ===\n");
+      jacobi_poisson1D(AB, RHS, X, &lab, &la, &ku, &kl, &tol, &maxit, resvec, &nbite);
+      break;
+    case 2:
+      printf("\n=== Méthode de Gauss-Seidel ===\n");
+      gauss_seidel_poisson1D(AB, RHS, X, &lab, &la, &ku, &kl, &tol, &maxit, resvec, &nbite);
+      break;
+    default:
+      printf("Méthode non implémentée\n");
+      return 1;
   }
+
+  /* Affichage des résultats */
+  printf("\nRésultats de convergence :\n");
+  printf("Nombre d'itérations : %d\n", nbite);
+  printf("Tolérance demandée : %e\n\n", tol);
+  
+  printf("Évolution du résidu :\n");
+  printf("Iteration\tRésidu\n");
+  for(int i = 0; i < nbite && i < 10; i++) {
+    printf("%d\t\t%e\n", i, resvec[i]);
+  }
+  if(nbite > 10) {
+    printf("...\n");
+    printf("%d\t\t%e\n", nbite-1, resvec[nbite-1]);
+  }
+
+  /* Calcul et affichage de l'erreur relative */
+  double forward_error = relative_forward_error(X, EX_SOL, &la);
+  printf("\nErreur relative : %e\n", forward_error);
 
   /* Richardson General Tridiag */
 
